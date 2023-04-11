@@ -142,7 +142,7 @@ with sird:
     S = slide_col2.slider('The S value in s.i.r.d(the population thats vulnerable)',min_value=0, max_value = 10000,value = 9000,step=40)
     I = slide_col2.slider('The I value in s.i.r.d(the infected population)',min_value=0, max_value = S,value =20,step=10)
     Rr = sel_col2.text_input("recovery rate in s.i.r.d",value=0.01)
-    Dr = sel_col2.text_input("Death rate in s.i.r.d",value=0.01)
+    Dr = sel_col2.text_input("Death rate in s.i.r.d",value=0.007)
     Ir = sel_col2.text_input("infection rate in s.i.r.d",value=0.00005)
     Ti =slide_col2.slider('simulation run time in s.i.r.d(in days)',min_value=0, max_value = 3000,value =100,step=100)
     if st.button("run s.i.r.d"):
