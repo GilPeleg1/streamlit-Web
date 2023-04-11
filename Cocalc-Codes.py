@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 import pandas as pd
 from scipy.integrate import odeint
+from PIL import Image
 
 
 header = st.container()
@@ -11,11 +12,12 @@ dataset = st.container()
 features = st.container()
 description = st.container()
 sird = st.container()
+explanation = st.container()
 
-def model(Sz,Ir,Iz,Rr):
+def model(Sz,Ir,Iz,Rr,T):
 #שיטת אוילר
         h = 0.1
-        t= np.arange(0,1000,h)#זמן
+        t= np.arange(0,T,h)#זמן
         beta = Ir#מקדם תחלואה
         gemma = Rr#מקדם החלמה
 
@@ -65,12 +67,13 @@ with features:
     st.header('S.I.R Simulator')
     S = slide_col.slider('The S value (the population thats vulnerable)',min_value=0, max_value = 10000,value = 1200,step=40)
     I = slide_col.slider('The I value (the infected population)',min_value=0, max_value = S,value =20,step=10)
+    T =slide_col.slider('simulation run time (in days)',min_value=0, max_value = 10000,value =1000,step=500)
     Rr = sel_col.text_input("recovery rate",value=0.01)
     Ir = sel_col.text_input("infection rate",value=0.00005)
     if st.button("run s.i.r"):
         fig = plt.figure()
         ###plots
-        data = model(float(S),float(Ir),float(I),float(Rr))
+        data = model(float(S),float(Ir),float(I),float(Rr),T)
         #plt.style.use('dark_background')
         plt.plot(data[0,0],data[0,1], 'r', label="S")
         plt.plot(data[1,0],data[1,1], 'b', label="I")
@@ -79,10 +82,10 @@ with features:
         plt.legend(fontsize=17)
         #title and axis labels
         #fig, ax = plt.subplots()
-        plt.xlim(0,1000)
-        plt.ylim(0,int(S*1.2))
+        plt.xlim(0,T)
+        plt.ylim(0,int((S+I)*1.2))
         plt.title('S.I.R Model Simulation', fontsize=18)
-        plt.xlabel('Time', fontsize=14)
+        plt.xlabel('Time (days)', fontsize=14)
         plt.ylabel('Population', fontsize=14)
         st.write(fig)
         plt.show()
@@ -108,7 +111,7 @@ def SIRD(ls, t, beta, gamma, mu):
         return [dSdt, dIdt, dRdt, dDdt]
 
         
-def sird_func(Sz,Ir,Iz,Rr,Dr):
+def sird_func(Sz,Ir,Iz,Rr,Dr,T):
 
 
     # Set initial conditions
@@ -121,8 +124,9 @@ def sird_func(Sz,Ir,Iz,Rr,Dr):
     beta = 0.00005#מקדם תחלואה
     gamma = 0.01#מקדם החלמה
     mu = 0.01# מקדם תמותה
-    time = 100
-    t = np.linspace(0, time, 1000)
+    time = T
+    h = 0.01
+    t = np.arange(0,time,h)
     # Solve the SIRD model using odeint
     Q = odeint(SIRD, [Sz, Iz, R0, D0], t, args=(Ir,Rr,Dr))
 
@@ -140,10 +144,11 @@ with sird:
     Rr = sel_col2.text_input("recovery rate in s.i.r.d",value=0.01)
     Dr = sel_col2.text_input("Death rate in s.i.r.d",value=0.01)
     Ir = sel_col2.text_input("infection rate in s.i.r.d",value=0.00005)
+    Ti =slide_col2.slider('simulation run time in s.i.r.d(in days)',min_value=0, max_value = 3000,value =100,step=100)
     if st.button("run s.i.r.d"):
         fig = plt.figure()
         ###plots
-        data =sird_func(float(S),float(Ir),float(I),float(Rr),float(Dr))
+        data =sird_func(float(S),float(Ir),float(I),float(Rr),float(Dr),Ti)
         #plt.style.use('dark_background')
         plt.plot(data[0,0],data[0,1], 'r', label="S")
         plt.plot(data[1,0],data[1,1], 'b', label="I")
@@ -152,11 +157,15 @@ with sird:
         plt.legend(fontsize=17)
         #title and axis labels
         #fig, ax = plt.subplots()
-        plt.xlim(0,time)
+        plt.xlim(0,Ti)
         plt.grid()
-        plt.ylim(0,int(S*1.2))
+        plt.ylim(0,int((S+I)*1.2))
         plt.title('S.I.R.D Model Simulation', fontsize=18)
-        plt.xlabel('Time', fontsize=14)
+        plt.xlabel('Time (days)', fontsize=14)
         plt.ylabel('Population', fontsize=14)
         st.write(fig)
         plt.show()
+
+with explanation:
+    img = Image.open('a.jpeg')
+    st.image(img)
