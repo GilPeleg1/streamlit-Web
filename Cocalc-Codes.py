@@ -87,6 +87,7 @@ with features:
         plt.title('S.I.R Model Simulation', fontsize=18)
         plt.xlabel('Time (days)', fontsize=14)
         plt.ylabel('Population', fontsize=14)
+        plt.grid()
         st.write(fig)
         plt.show()
 
